@@ -21,6 +21,17 @@ if ($conn->connect_error) {
     http_response_code(500);
     die('Erro de conexão com o banco de dados. Verifique config.php. (' . $conn->connect_error . ')');
 }
+function get_config($conn, $chave, $default = '') {
+    $stmt = $conn->prepare("SELECT valor FROM configuracoes WHERE chave = ? LIMIT 1");
+    $stmt->bind_param('s', $chave);
+    $stmt->execute();
+    $res = $stmt->get_result();
+    if ($row = $res->fetch_assoc()) {
+        return $row['valor'];
+    }
+    return $default;
+}  
+
 $conn->set_charset('utf8mb4');
 $conn->query("SET time_zone = '-03:00'"); // mantém o horário do banco igual ao de Recife (evita pedidos "somem" do dia no dashboard perto da meia-noite)
 
